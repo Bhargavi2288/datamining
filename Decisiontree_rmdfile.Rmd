@@ -1,0 +1,58 @@
+---
+title: "PVA SLICE DATA SET DECISION TREE"
+author: "Bhargavi"
+date: "October 26, 2017"
+output: pdf_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+
+###install.packages("rpart") ## only do  this once
+
+library(rpart)
+?rpart()
+?rpart.control()
+
+mydata_pva <- read.table("PVAslice.csv", header = TRUE ,sep=",", skipNul = TRUE)
+###mydata_pva
+mydatanames <- names(mydata_pva)
+mydatanames
+dim(mydata_pva)
+
+### target_b is the target variable
+### factor the target
+target_var<- factor(mydata_pva$TARGET_B)
+###target_var
+
+
+### training data frame excluding TARGET_B and TARGET_D
+first100df <-data.frame(target_var,mydata_pva[,!names(mydata_pva) %in% 
+                                                c("TARGET_B","TARGET_D")])
+head(first100df)
+dim(first100df)
+
+### building the model
+myrpart <-rpart(target_var~ .,data = first100df)
+names(myrpart)
+
+plot(myrpart)
+
+text(myrpart, splits = FALSE)
+####get the important variables
+
+myrpart$variable.importance
+
+###summary(myrpart)
+### training data
+pred <- predict(myrpart,type ="class")
+### confusion matrix for the training data
+table(first100df$target_var, pred)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
